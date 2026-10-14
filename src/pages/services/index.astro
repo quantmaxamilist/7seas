@@ -1,0 +1,12 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/site/PageHero.astro';
+import Services from '../../components/home/Services.astro';
+import QuoteBand from '../../components/site/QuoteBand.astro';
+import { titles, descriptions, site, area } from '../../data/site';
+---
+<Base title={titles.services} description={descriptions.services} crumbs={[{ name: 'Services', path: '/services' }]}>
+  <PageHero kicker={`Builders in ${area.town}, ${area.county}`} title="Services" lead={site.tagline} />
+  <Services variant="blueprint" heading="Choose a service" />
+  <QuoteBand />
+</Base>

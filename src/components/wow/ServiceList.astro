@@ -1,0 +1,29 @@
+---
+import { services } from '../../data/site';
+---
+<ol class="sl" role="list" data-sl>
+  {services.map((s, i) => (
+    <li class="sl__item" data-part={s.slug}>
+      <a href={`/services/${s.slug}`} class="sl__link">
+        <span class="sl__n label">{String(i + 1).padStart(2, '0')}</span>
+        <span class="sl__body">
+          <span class="sl__name">{s.name}</span>
+          <span class="sl__txt">{s.body}</span>
+        </span>
+        <span class="sl__go" aria-hidden="true">→</span>
+      </a>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .sl { display: grid; border-top: 1px solid var(--line-dark); }
+  .sl__item { border-bottom: 1px solid var(--line-dark); }
+  .sl__link { position: relative; display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: var(--s-4); padding: var(--s-5) 2.5rem var(--s-5) 0; text-decoration: none; transition: background var(--dur-2); }
+  .sl__n { color: var(--orange); padding-top: 0.45em; }
+  .sl__name { display: block; font-family: var(--font-display); font-weight: 800; font-stretch: 115%; font-size: var(--fs-display-3); line-height: 1.05; transition: color var(--dur-2); }
+  .sl__txt { display: block; margin-top: var(--s-3); color: rgba(255, 255, 255, 0.72); font-size: 0.95rem; max-width: 52ch; }
+  .sl__go { position: absolute; right: 0.25rem; top: var(--s-5); font-size: 1.5rem; color: var(--orange); transition: transform var(--dur-2) var(--ease-out); }
+  .sl__item.hl .sl__name, .sl__link:hover .sl__name { color: var(--orange); }
+  .sl__item.hl .sl__go, .sl__link:hover .sl__go { transform: translateX(4px); }
+</style>

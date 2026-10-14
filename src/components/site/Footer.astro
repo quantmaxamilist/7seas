@@ -1,0 +1,59 @@
+---
+import { site, services, google, area } from '../../data/site';
+import GoogleRating from './GoogleRating.astro';
+const year = new Date().getFullYear();
+---
+<footer class="ftr dark">
+  <div class="container ftr__grid">
+    <div class="ftr__brand">
+      <img src="/img/brand/logo-on-dark.png" width="916" height="544" alt="7 Seas Builders" loading="lazy" />
+      <p class="ftr__area">Builders in {area.town}, {area.county}, working across {area.region}.</p>
+      <GoogleRating />
+      <a class="ftr__review" href={google.writeReviewUrl} target="_blank" rel="noopener">Worked with us? Leave a Google review →</a>
+    </div>
+    <div>
+      <p class="label ftr__h">Services</p>
+      <ul role="list">{services.map((s) => <li><a href={`/services/${s.slug}`}>{s.name}</a></li>)}</ul>
+    </div>
+    <div>
+      <p class="label ftr__h">Site</p>
+      <ul role="list"><li><a href="/">Home</a></li><li><a href="/services">Services</a></li><li><a href="/gallery">Gallery</a></li><li><a href="/contact">Contact</a></li></ul>
+    </div>
+    <div>
+      <p class="label ftr__h">Contact</p>
+      <ul role="list">
+        <li><a href={site.phoneHref}>{site.phone}</a></li>
+        <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+        <li><a href={google.mapsUrl} target="_blank" rel="noopener">{site.legalName}<br />{site.address}</a></li>
+      </ul>
+      <p class="label ftr__h ftr__h2">Opening hours</p>
+      <ul role="list" class="ftr__hours">{google.hours.map((h) => <li><span>{h.days}</span><span>{h.time}</span></li>)}</ul>
+    </div>
+  </div>
+  <div class="container ftr__base">
+    <p>Copyright © {year} 7 seas builders</p>
+    <a href="#top" data-top>Back to top ↑</a>
+  </div>
+</footer>
+
+<style>
+  .ftr { padding-block: var(--s-9) var(--s-6); border-top: 4px solid var(--orange); }
+  .ftr__grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.3fr; gap: var(--s-7); }
+  .ftr__brand { display: grid; justify-items: start; align-content: start; gap: var(--s-4); }
+  .ftr__brand img { width: 180px; }
+  .ftr__area { color: rgba(255, 255, 255, 0.75); max-width: 30ch; font-size: 0.95rem; }
+  .ftr__review { font-size: 0.9rem; color: rgba(255, 255, 255, 0.82); }
+  .ftr__h2 { margin-top: var(--s-6); }
+  .ftr__hours li { display: flex; justify-content: space-between; gap: var(--s-4); font-size: 0.9rem; }
+  .ftr__h { color: var(--orange); margin-bottom: var(--s-4); }
+  .ftr ul { display: grid; gap: var(--s-2); color: rgba(255, 255, 255, 0.82); }
+  .ftr a { text-decoration: none; }
+  .ftr a:hover { color: var(--orange); }
+  .ftr__base { display: flex; justify-content: space-between; gap: var(--s-4); margin-top: var(--s-8); padding-top: var(--s-5); border-top: 1px solid var(--line-dark); font-size: var(--fs-small); color: rgba(255, 255, 255, 0.6); }
+  @media (max-width: 860px) {
+    .ftr { padding-bottom: calc(var(--s-6) + 72px); }
+    .ftr__grid { grid-template-columns: 1fr 1fr; gap: var(--s-6); }
+    .ftr__brand { grid-column: 1 / -1; }
+    .ftr__grid > div:last-child { grid-column: 1 / -1; }
+  }
+</style>

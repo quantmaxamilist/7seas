@@ -1,0 +1,66 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/site/PageHero.astro';
+import PhotoGrid from '../../components/site/PhotoGrid.astro';
+import QuoteBand from '../../components/site/QuoteBand.astro';
+import Icon from '../../components/site/Icon.astro';
+import { services, site, titles, area } from '../../data/site';
+import { byCat, serviceCats, img } from '../../data/extra';
+
+export function getStaticPaths() {
+  return services.map((s) => ({ params: { slug: s.slug } }));
+}
+const { slug } = Astro.params;
+const i = services.findIndex((s) => s.slug === slug);
+const s = services[i];
+const next = services[(i + 1) % services.length];
+const pics = byCat(serviceCats[slug!]);
+const nextCover: Record<string, string> = { refurbishments: '04', extensions: '33', 'loft-conversion': '09' };
+---
+<Base title={titles.service(s.name)} description={`${s.name} in ${area.town}, ${area.county} from 7 Seas Builders. ${s.body}`.slice(0, 158)}
+  crumbs={[{ name: 'Services', path: '/services' }, { name: s.name, path: `/services/${s.slug}` }]}
+  extraLd={[{ '@context': 'https://schema.org', '@type': 'Service', name: s.name, serviceType: s.name, description: s.body,
+    provider: { '@id': new URL('/#business', Astro.site).href },
+    areaServed: [{ '@type': 'City', name: area.town }, { '@type': 'AdministrativeArea', name: area.county }, { '@type': 'AdministrativeArea', name: area.region }],
+    url: new URL(`/services/${s.slug}`, Astro.site).href }]}>
+  <PageHero kicker={`${area.town}, ${area.county} · Service ${String(i + 1).padStart(2, '0')} of ${services.length}`} title={s.name} crumbs={[{ href: '/services', label: 'Services' }]} />
+  <section class="section light">
+    <div class="container sv">
+      <p class="statement sv__body" data-reveal>{s.body}</p>
+      <div class="sv__side" data-reveal style="--d:.06s">
+        <a class="btn" href={`/contact?package=${s.slug}`}>Ask for a free quote<Icon name="arrow" /></a>
+        <a class="sv__tel" href={site.phoneHref}><Icon name="phone" />{site.phone}</a>
+      </div>
+    </div>
+    <div class="container sv__work">
+      <h2 class="label sv__h" data-reveal>{pics.length} photos from our gallery</h2>
+      <PhotoGrid photos={pics} id={`pg-${s.slug}`} />
+    </div>
+  </section>
+  <a class="nx dark" href={`/services/${next.slug}`}>
+    <div class="container nx__in">
+      <div>
+        <p class="label nx__k">Next service</p>
+        <p class="display d2 nx__name">{next.name} <span aria-hidden="true">→</span></p>
+      </div>
+      <div class="ph nx__ph"><img src={img(nextCover[next.slug], true)} alt="" width="560" height="420" loading="lazy" /></div>
+    </div>
+  </a>
+  <QuoteBand />
+</Base>
+
+<style>
+  .sv { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: var(--s-7); align-items: start; }
+  .sv__side { display: grid; justify-items: start; gap: var(--s-4); padding-top: var(--s-2); }
+  .sv__tel { display: inline-flex; align-items: center; gap: 0.5em; font-family: var(--font-mono); text-decoration: none; height: 44px; }
+  .sv__tel :global(svg) { color: var(--orange); }
+  .sv__work { margin-top: var(--s-9); }
+  .sv__h { color: var(--blue); margin-bottom: var(--s-5); font-weight: 500; }
+  .nx { display: block; text-decoration: none; padding-block: var(--s-8); border-top: 1px solid var(--line-dark); }
+  .nx__in { display: flex; justify-content: space-between; align-items: center; gap: var(--s-6); }
+  .nx__k { color: var(--orange); margin-bottom: var(--s-3); }
+  .nx__name span { display: inline-block; transition: transform var(--dur-2) var(--ease-out); }
+  .nx:hover .nx__name span { transform: translateX(8px); }
+  .nx__ph { width: min(320px, 34vw); aspect-ratio: 4 / 3; flex: none; }
+  @media (max-width: 760px) { .sv { grid-template-columns: minmax(0, 1fr); } .nx__ph { display: none; } }
+</style>

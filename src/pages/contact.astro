@@ -1,0 +1,123 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/site/PageHero.astro';
+import Icon from '../components/site/Icon.astro';
+import { titles, descriptions, site, services, quote, contactForm, google } from '../data/site';
+import GoogleRating from '../components/site/GoogleRating.astro';
+---
+<Base title={titles.contact} description={descriptions.contact} crumbs={[{ name: 'Contact', path: '/contact' }]}>
+  <PageHero title="Contact" lead={quote.body.replace(/ Click below to contact us$/, '')} />
+  <section class="section light">
+    <div class="container ct">
+      <div class="ct__details">
+        <a class="ct__card ct__card--big" href={site.phoneHref} data-reveal>
+          <span class="label">Phone</span>
+          <span class="ct__val display">{site.phone}</span>
+          <Icon name="phone" />
+        </a>
+        <a class="ct__card" href={`mailto:${site.email}`} data-reveal style="--d:.05s">
+          <span class="label">Email</span>
+          <span class="ct__val">{site.email}</span>
+          <Icon name="mail" />
+        </a>
+        <div class="ct__card" data-reveal style="--d:.1s">
+          <span class="label">Address</span>
+          <span class="ct__val">{site.legalName}<br />{site.address}</span>
+          <a class="ct__link" href={google.mapsUrl} target="_blank" rel="noopener">Open in Google Maps →</a>
+          <Icon name="pin" />
+        </div>
+        <div class="ct__card" data-reveal style="--d:.12s">
+          <span class="label">Opening hours</span>
+          <ul class="ct__hours" role="list">{google.hours.map((h) => <li><span>{h.days}</span><span>{h.time}</span></li>)}</ul>
+        </div>
+        <div class="ct__card ct__card--g" data-reveal style="--d:.14s">
+          <span class="label">Google reviews</span>
+          <GoogleRating tone="light" />
+          <a class="ct__link" href={google.writeReviewUrl} target="_blank" rel="noopener">Worked with us? Leave a review →</a>
+        </div>
+      </div>
+
+      <form class="ct__form" data-form action={`mailto:${site.email}`} method="post" enctype="text/plain" data-reveal style="--d:.08s">
+        <h2 class="display d3">{quote.heading}</h2>
+        <fieldset class="ct__svc">
+          <legend class="label">Services</legend>
+          {services.map((s) => (
+            <label class="ct__tick"><input type="checkbox" name="service" value={s.name} data-slug={s.slug} /><span>{s.name}</span></label>
+          ))}
+        </fieldset>
+        <div class="ct__row">
+          <label class="ct__f"><span>Name <b aria-hidden="true">*</b></span><input name="name" required autocomplete="name" /></label>
+          <label class="ct__f"><span>Email <b aria-hidden="true">*</b></span><input name="email" type="email" required autocomplete="email" /></label>
+        </div>
+        <label class="ct__f"><span>Phone Number</span><input name="phone" type="tel" autocomplete="tel" /></label>
+        <label class="ct__f"><span>Message <b aria-hidden="true">*</b></span><textarea name="message" rows="5" required></textarea></label>
+        <fieldset class="ct__gdpr">
+          <legend class="label">GDPR Compliance <b aria-hidden="true">*</b></legend>
+          <label class="ct__tick ct__tick--plain"><input type="checkbox" name="consent" required /><span>{contactForm.consent}</span></label>
+        </fieldset>
+        <button class="btn" type="submit">Submit<Icon name="arrow" /></button>
+        <p class="ct__note" data-note hidden>Your email app should now open with your message ready to send. If it doesn't, call {site.phone} or email {site.email}.</p>
+      </form>
+    </div>
+  </section>
+  <iframe class="ct__map" title="Map showing 7 Seas Builders, 12 Fairfax Rd, Woking GU22 9HW" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+    src="https://maps.google.com/maps?q=7%20Seas%20Builders%20Limited%2C%2012%20Fairfax%20Rd%2C%20Woking%20GU22%209HW&z=15&output=embed"></iframe>
+</Base>
+
+<style>
+  .ct { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(2rem, 1rem + 3vw, 5rem); align-items: start; }
+  .ct__details { display: grid; gap: var(--s-3); }
+  .ct__card { position: relative; display: grid; gap: var(--s-2); padding: var(--s-5) var(--s-6); padding-right: 4rem; background: var(--white); text-decoration: none; border-left: 4px solid var(--blue); }
+  .ct__card .label { color: var(--blue); }
+  .ct__card > :global(svg) { position: absolute; right: var(--s-5); top: var(--s-5); color: var(--orange); width: 22px; height: 22px; }
+  .ct__card--big { background: var(--navy); color: var(--white); border-left-color: var(--orange); }
+  .ct__card--big .label { color: var(--orange); }
+  .ct__val { font-size: 1.1rem; overflow-wrap: anywhere; }
+  .ct__card--big .ct__val { font-size: var(--fs-display-3); }
+  a.ct__card:hover { border-left-color: var(--orange); }
+  .ct__link { color: var(--blue); font-weight: 600; font-size: 0.95rem; justify-self: start; }
+  .ct__link:hover { color: var(--orange-deep); }
+  .ct__hours { list-style: none; padding: 0; display: grid; gap: var(--s-1); }
+  .ct__hours li { display: flex; justify-content: space-between; gap: var(--s-4); }
+  .ct__card--g { justify-items: start; gap: var(--s-3); }
+  .ct__map { display: block; width: 100%; height: clamp(300px, 38vw, 460px); border: 0; }
+
+  .ct__form { display: grid; gap: var(--s-5); background: var(--white); padding: clamp(1.25rem, 0.8rem + 2vw, 2.5rem); border-top: 4px solid var(--orange); }
+  .ct__row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-4); }
+  .ct__f { display: grid; gap: var(--s-2); font-weight: 500; font-size: 0.95rem; }
+  .ct__f b, .ct__gdpr b { color: var(--orange-deep); }
+  .ct__f input, .ct__f textarea { font: inherit; font-weight: 400; width: 100%; min-height: 48px; padding: 0.7rem 0.9rem; border: 1.5px solid var(--line); border-radius: var(--radius); background: var(--paper); color: var(--ink); }
+  .ct__f input:focus, .ct__f textarea:focus { outline: none; border-color: var(--blue); background: var(--white); }
+  fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+  legend { padding: 0; margin-bottom: var(--s-3); color: var(--blue); }
+  .ct__svc { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .ct__svc legend { width: 100%; }
+  .ct__tick { position: relative; display: inline-flex; cursor: pointer; }
+  .ct__tick input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+  .ct__svc .ct__tick span { display: inline-flex; align-items: center; height: 44px; padding: 0 1rem; border: 1.5px solid var(--line); border-radius: 999px; font-weight: 500; transition: background var(--dur-1), color var(--dur-1); }
+  .ct__svc .ct__tick input:checked + span { background: var(--navy); color: var(--white); border-color: var(--navy); }
+  .ct__svc .ct__tick input:focus-visible + span { outline: 2px solid var(--orange); outline-offset: 2px; }
+  .ct__tick--plain { gap: var(--s-3); align-items: start; font-size: 0.95rem; color: var(--ink-soft); }
+  .ct__tick--plain input { position: static; opacity: 1; width: 20px; height: 20px; margin-top: 2px; flex: none; accent-color: var(--blue); }
+  .ct__form .btn { justify-self: start; }
+  .ct__note { font-size: var(--fs-small); color: var(--ink-soft); }
+  @media (max-width: 900px) { .ct { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 560px) { .ct__row { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  // ?package=<slug> pre-ticks the matching service
+  const pkg = new URLSearchParams(location.search).get('package');
+  if (pkg) document.querySelectorAll<HTMLInputElement>('.ct__svc input').forEach((i) => { if (i.dataset.slug === pkg) i.checked = true; });
+
+  // No form backend yet: compose an email in the visitor's mail app
+  const form = document.querySelector<HTMLFormElement>('[data-form]');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const d = new FormData(form);
+    const svc = d.getAll('service').join(', ');
+    const body = [`Name: ${d.get('name')}`, `Email: ${d.get('email')}`, `Phone: ${d.get('phone') || '-'}`, `Services: ${svc || '-'}`, '', `${d.get('message')}`].join('\n');
+    location.href = `${form.action}?subject=${encodeURIComponent('Free quote request' + (svc ? ' – ' + svc : ''))}&body=${encodeURIComponent(body)}`;
+    form.querySelector<HTMLElement>('[data-note]')!.hidden = false;
+  });
+</script>

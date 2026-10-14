@@ -1,0 +1,35 @@
+---
+import { site, quote } from '../../data/site';
+import Icon from './Icon.astro';
+import BgVideo from './BgVideo.astro';
+---
+<section class="qb" aria-labelledby="qb-h">
+  <div class="qb__vid"><BgVideo name="plaster" opacity={0.5} blend="multiply" /></div>
+  <div class="container qb__in">
+    <div>
+      <h2 id="qb-h" class="display d1" data-reveal>{quote.heading}</h2>
+    </div>
+    <div class="qb__side" data-reveal style="--d:.08s">
+      <p class="lead">{quote.body}</p>
+      <div class="qb__acts">
+        <a class="btn btn--navy" href="/contact">Contact<Icon name="arrow" /></a>
+        <a class="qb__tel" href={site.phoneHref}><Icon name="phone" />{site.phone}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .qb { background: var(--orange); color: var(--navy); padding-block: var(--section); position: relative; overflow: hidden; }
+  .qb::before { content: ''; position: absolute; inset: auto -5% -1px; height: 38%; background: var(--orange-deep);
+    clip-path: polygon(0 100%, 0 70%, 22% 15%, 48% 62%, 76% 0, 100% 55%, 100% 100%); opacity: 0.45; z-index: 1; }
+  .qb__vid { position: absolute; inset: 0; -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 35%, transparent 75%); mask-image: linear-gradient(90deg, #000 0%, #000 35%, transparent 75%); }
+  @media (max-width: 760px) { .qb__vid { -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 60%); mask-image: linear-gradient(180deg, #000 0%, transparent 60%); } }
+  .qb__in { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-7); align-items: end; }
+  .qb .lead { max-width: 36ch; font-weight: 500; }
+  .qb__acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-5); margin-top: var(--s-6); }
+  .qb__tel { display: inline-flex; align-items: center; gap: 0.5em; font-family: var(--font-mono); font-size: 1.05rem; text-decoration: none; font-weight: 500; }
+  .qb__tel :global(svg) { width: 18px; }
+  .qb__tel:hover { text-decoration: underline; }
+  @media (max-width: 760px) { .qb__in { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); } }
+</style>

@@ -1,0 +1,46 @@
+---
+import { reviews, reviewsHeading, google } from '../../data/site';
+import Icon from '../site/Icon.astro';
+import GoogleRating from '../site/GoogleRating.astro';
+import BgVideo from '../site/BgVideo.astro';
+---
+<section class="rv section dark" aria-labelledby="rv-h">
+  <BgVideo name="suburb" opacity={0.4} mobile />
+  <div class="container rv__in">
+    <div class="rv__head">
+      <div>
+        <h2 id="rv-h" class="display d2" data-reveal>{reviewsHeading}</h2>
+        <div class="rv__rating" data-reveal style="--d:.05s"><GoogleRating size="lg" /></div>
+      </div>
+      <div class="rv__acts" data-reveal style="--d:.08s">
+        <a class="btn" href={google.mapsUrl} target="_blank" rel="noopener">More Reviews...<Icon name="arrow" /></a>
+        <a class="btn btn--ghost" href={google.writeReviewUrl} target="_blank" rel="noopener">Leave us a Google review</a>
+      </div>
+    </div>
+    <ul class="rv__grid" role="list">
+      {reviews.map((r, i) => (
+        <li class="rv__card" data-reveal style={`--d:${i * 0.07}s`}>
+          <span class="rv__mark" aria-hidden="true">“</span>
+          <blockquote>{r.quote.split('\n').map((l) => <p>{l}</p>)}</blockquote>
+          <p class="rv__name label">{r.name}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .rv { position: relative; overflow: hidden; }
+  .rv::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 28, 51, 0.9) 0%, rgba(5, 28, 51, 0.35) 45%, rgba(5, 28, 51, 0.9) 100%); pointer-events: none; z-index: 0; }
+  .rv__in { position: relative; z-index: 1; }
+  .rv__head { display: flex; justify-content: space-between; align-items: end; gap: var(--s-5); flex-wrap: wrap; margin-bottom: var(--s-7); }
+  .rv__rating { margin-top: var(--s-5); }
+  .rv__acts { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+  .rv__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-4); }
+  .rv__card { position: relative; background: var(--white); color: var(--ink); padding: var(--s-6); display: flex; flex-direction: column; gap: var(--s-4); border-top: 4px solid var(--blue); }
+  .rv__card:nth-child(2) { border-top-color: var(--orange); }
+  .rv__mark { font-family: var(--font-display); font-weight: 900; font-size: 4rem; line-height: 0.6; height: 1.6rem; color: var(--orange); }
+  .rv blockquote { margin: 0; font-size: 1.1rem; line-height: 1.5; display: grid; gap: var(--s-2); }
+  .rv__name { margin-top: auto; color: var(--blue); font-weight: 500; }
+  @media (max-width: 900px) { .rv__grid { grid-template-columns: minmax(0, 1fr); } }
+</style>

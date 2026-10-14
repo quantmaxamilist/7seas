@@ -1,0 +1,35 @@
+---
+import { photos, img } from '../../data/extra';
+import Icon from '../site/Icon.astro';
+const pick = ['04', '02', '09', '24', '15', '40', '23', '12', '37'].map((n) => photos.find((p) => p.n === n)!);
+---
+<section class="ws section white" aria-labelledby="ws-h">
+  <div class="container">
+    <div class="ws__head">
+      <h2 id="ws-h" class="display d2" data-reveal>Gallery</h2>
+      <a class="btn btn--navy" href="/gallery" data-reveal>View all {photos.length} photos<Icon name="arrow" /></a>
+    </div>
+    <ul class="ws__grid" role="list">
+      {pick.map((p, i) => (
+        <li class:list={['ph', `ws__i${i}`]} data-reveal style={`--d:${(i % 4) * 0.05}s`}>
+          <a href="/gallery" aria-label={`${p.alt} — open gallery`}><img src={img(p.n, true)} alt={p.alt} width="560" height="420" loading="lazy" /></a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .ws__head { display: flex; justify-content: space-between; align-items: end; gap: var(--s-5); flex-wrap: wrap; margin-bottom: var(--s-7); }
+  .ws__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: clamp(140px, 14vw, 230px); gap: 8px; grid-auto-flow: dense; }
+  .ws__grid a { display: block; height: 100%; }
+  .ws__grid img { transition: transform 0.8s var(--ease-out); }
+  .ws__grid a:hover img { transform: scale(1.04); }
+  .ws__i0 { grid-row: span 2; }
+  .ws__i3 { grid-row: span 2; }
+  .ws__i5 { grid-column: span 2; }
+  @media (max-width: 760px) {
+    .ws__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 150px; }
+    .ws__i5 { grid-column: auto; }
+  }
+</style>

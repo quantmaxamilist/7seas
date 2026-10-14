@@ -1,0 +1,99 @@
+---
+import { site, services } from '../../data/site';
+import Icon from './Icon.astro';
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const nav = [
+  { href: '/', label: 'Home' },
+  { href: '/services', label: 'Services' },
+  { href: '/gallery', label: 'Gallery' },
+  { href: '/contact', label: 'Contact' },
+];
+const on = (h: string) => (h === '/' ? path === '/' : path.startsWith(h));
+---
+<header class="hdr" data-header>
+  <div class="hdr__in container">
+    <a class="hdr__logo" href="/" aria-label={`${site.name} — home`}>
+      <img src="/img/brand/logo-on-dark.png" width="916" height="544" alt="7 Seas Builders" />
+    </a>
+    <nav class="hdr__nav" aria-label="Main">
+      {nav.map((n) => <a href={n.href} class:list={['hdr__link', { on: on(n.href) }]} aria-current={on(n.href) ? 'page' : undefined}>{n.label}</a>)}
+    </nav>
+    <div class="hdr__cta">
+      <a class="hdr__phone" href={site.phoneHref}><Icon name="phone" /><span>{site.phone}</span></a>
+      <a class="btn hdr__quote" href="/contact">Free quote</a>
+      <button class="hdr__burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu" data-menu-open><Icon name="menu" /></button>
+    </div>
+  </div>
+</header>
+
+<div class="menu" id="menu" data-menu hidden>
+  <div class="menu__in container">
+    <button class="menu__close" type="button" aria-label="Close menu" data-menu-close><Icon name="close" /></button>
+    <nav aria-label="Mobile">
+      {nav.map((n, i) => <a href={n.href} class="menu__link display" style={`--i:${i}`}>{n.label}</a>)}
+    </nav>
+    <ul class="menu__svc" role="list">
+      {services.map((s) => <li><a href={`/services/${s.slug}`}>{s.name}</a></li>)}
+    </ul>
+    <div class="menu__foot">
+      <a class="btn" href={site.phoneHref}><Icon name="phone" />Call {site.phone}</a>
+      <a class="btn btn--ghost" href={`mailto:${site.email}`}>{site.email}</a>
+    </div>
+  </div>
+</div>
+
+<!-- phones: call + quote always in reach -->
+<div class="dock" data-dock>
+  <a href={site.phoneHref} class="dock__call"><Icon name="phone" />Call</a>
+  <a href="/contact" class="dock__quote">Free quote<Icon name="arrow" /></a>
+</div>
+
+<style>
+  .hdr { position: fixed; inset: 0 0 auto; z-index: var(--z-header); height: var(--header-h); color: var(--white);
+    background: rgba(5, 28, 51, 0.94); border-bottom: 1px solid var(--line-dark); transition: transform var(--dur-2) var(--ease-out); }
+  .hdr.is-hidden { transform: translateY(-100%); }
+  .hdr__in { height: 100%; display: flex; align-items: center; gap: var(--s-6); }
+  .hdr__logo { flex: none; display: block; }
+  .hdr__logo img { height: 50px; width: auto; }
+  .hdr__nav { display: flex; gap: var(--s-6); margin-left: auto; }
+  .hdr__link { position: relative; text-decoration: none; font-weight: 500; font-size: 0.95rem; height: 44px; display: flex; align-items: center; opacity: 0.86; }
+  .hdr__link::after { content: ''; position: absolute; left: 0; right: 0; bottom: 8px; height: 2px; background: var(--orange); transform: scaleX(0); transform-origin: left; transition: transform var(--dur-2) var(--ease-out); }
+  .hdr__link:hover, .hdr__link.on { opacity: 1; }
+  .hdr__link:hover::after, .hdr__link.on::after { transform: scaleX(1); }
+  .hdr__cta { display: flex; align-items: center; gap: var(--s-5); }
+  .hdr__phone { display: flex; align-items: center; gap: 0.5em; text-decoration: none; font-family: var(--font-mono); font-size: 0.9rem; height: 44px; }
+  .hdr__phone :global(svg) { width: 16px; color: var(--orange); }
+  .hdr__quote { height: 44px; }
+  .hdr__burger { display: none; width: 44px; height: 44px; background: none; border: 1px solid var(--line-dark); border-radius: var(--radius); place-items: center; }
+  .hdr__burger :global(svg) { width: 22px; }
+  @media (max-width: 1080px) { .hdr__phone span { display: none; } .hdr__nav { gap: var(--s-5); } }
+  @media (max-width: 860px) {
+    .hdr__nav, .hdr__phone, .hdr__quote { display: none; }
+    .hdr__cta { margin-left: auto; }
+    .hdr__burger { display: grid; }
+    .hdr__logo img { height: 44px; }
+  }
+
+  .menu { position: fixed; inset: 0; z-index: var(--z-dialog); background: var(--navy); color: var(--white); overflow-y: auto; }
+  .menu[hidden] { display: none; }
+  .menu__in { min-height: 100%; display: flex; flex-direction: column; gap: var(--s-6); padding-block: var(--s-5) var(--s-7); }
+  .menu__close { align-self: flex-end; width: 44px; height: 44px; background: none; border: 1px solid var(--line-dark); border-radius: var(--radius); display: grid; place-items: center; }
+  .menu__close :global(svg) { width: 22px; }
+  .menu nav { display: grid; gap: var(--s-2); }
+  .menu__link { font-size: var(--fs-display-3); text-decoration: none; animation: mIn 0.4s var(--ease-out) both; animation-delay: calc(var(--i) * 40ms); }
+  .menu__svc { display: grid; gap: var(--s-2); border-top: 1px solid var(--line-dark); padding-top: var(--s-5); }
+  .menu__svc a { text-decoration: none; opacity: 0.8; }
+  .menu__foot { margin-top: auto; display: grid; gap: var(--s-3); }
+  .menu__foot .btn { justify-content: center; }
+  @keyframes mIn { from { opacity: 0; transform: translateY(12px); } }
+
+  .dock { display: none; }
+  @media (max-width: 860px) {
+    .dock { position: fixed; z-index: var(--z-dial); left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: 1fr 1.4fr;
+      padding: 8px max(8px, env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom)); gap: 8px; background: rgba(5, 28, 51, 0.96); border-top: 1px solid var(--line-dark); }
+    .dock a { height: 48px; display: flex; align-items: center; justify-content: center; gap: 0.5em; border-radius: var(--radius); text-decoration: none; font-family: var(--font-display); font-weight: 800; font-stretch: 110%; }
+    .dock :global(svg) { width: 18px; }
+    .dock__call { color: var(--white); box-shadow: inset 0 0 0 1.5px var(--line-dark); }
+    .dock__quote { background: var(--orange); color: var(--navy); }
+  }
+</style>

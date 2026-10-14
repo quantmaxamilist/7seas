@@ -1,0 +1,20 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from './Hero.astro';
+import Proof from './Proof.astro';
+import About from './About.astro';
+import Services from './Services.astro';
+import WorkStrip from './WorkStrip.astro';
+import Reviews from './Reviews.astro';
+import QuoteBand from '../site/QuoteBand.astro';
+import { titles, descriptions } from '../../data/site';
+---
+<Base title={titles.home} description={descriptions.home}>
+  <Hero />
+  <Proof />
+  <About />
+  <Services variant="house" />
+  <WorkStrip />
+  <Reviews />
+  <QuoteBand />
+</Base>

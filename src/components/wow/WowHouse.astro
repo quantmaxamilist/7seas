@@ -1,0 +1,75 @@
+---
+// A cut-away 3D house that assembles itself: main house + fittings (Refurbishments),
+// roof space with dormer (Loft Conversion), single-storey side extension (Extensions).
+---
+<div class="wh" data-wh>
+  <img class="wh__poster" src="/img/wow-house-poster.webp" alt="" width="1200" height="930" loading="lazy" />
+  <canvas class="wh__cv" aria-label="3D model of a house showing refurbishment, extension and loft conversion" role="img"></canvas>
+  <button class="pin" data-pin="refurbishments" aria-label="Refurbishments"></button>
+  <button class="pin" data-pin="extensions" aria-label="Extensions"></button>
+  <button class="pin" data-pin="loft-conversion" aria-label="Loft Conversion"></button>
+</div>
+
+<style>
+  .wh { position: absolute; inset: 0; }
+  .wh__cv, .wh__poster { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .wh__poster { object-fit: contain; opacity: 0; transition: opacity 0.4s; }
+  .wh.poster .wh__poster { opacity: 1; }
+  .wh.poster .wh__cv { display: none; }
+  .wh .pin { left: 0; top: 0; position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; border: 0; padding: 0; background: var(--orange);
+    box-shadow: 0 0 0 4px rgba(242, 103, 34, 0.3), 0 4px 14px rgba(0, 0, 0, 0.4); opacity: 0; pointer-events: none;
+    transition: opacity 0.4s, box-shadow var(--dur-2); }
+  :global(.svc.done) .wh:not(.poster) .pin.placed { opacity: 1; pointer-events: auto; }
+  :global(.svc[data-hl='refurbishments']) .pin[data-pin='refurbishments'],
+  :global(.svc[data-hl='extensions']) .pin[data-pin='extensions'],
+  :global(.svc[data-hl='loft-conversion']) .pin[data-pin='loft-conversion'] { box-shadow: 0 0 0 10px rgba(242, 103, 34, 0.35), 0 4px 14px rgba(0, 0, 0, 0.4); }
+</style>
+
+<script>
+  import { mountWow } from '../../scripts/wow.js';
+  import { gsap } from 'gsap';
+
+  const root = document.querySelector('[data-wh]');
+  const section = root?.closest('.svc');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hasGL = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; } })();
+
+  if (root && section) {
+    if (reduce || !hasGL) {
+      root.classList.add('poster');
+      mountWow(section, { reset() {}, play() {}, finish() {}, highlight() {} });
+    } else {
+      let scenePromise = null;
+      const load = () => (scenePromise ||= import('./house-scene.js').then((m) => m.createHouse(root.querySelector('canvas'))));
+      ('requestIdleCallback' in window ? requestIdleCallback : setTimeout)(() => load(), { timeout: 2500 });
+
+      let tl = null;
+      const pins = [...root.querySelectorAll('.pin')];
+      const placePins = (s) => {
+        const w = root.clientWidth, h = root.clientHeight;
+        pins.forEach((p) => {
+          const v = s.anchor(p.dataset.pin);
+          if (!v) return;
+          p.style.transform = `translate(${v.x * w}px, ${v.y * h}px)`;
+          p.classList.add('placed');
+        });
+      };
+      pins.forEach((p) => p.addEventListener('click', () => { location.href = `/services/${p.dataset.pin}`; }));
+
+      mountWow(section, {
+        reset() { tl?.kill(); load().then((s) => s.reset()); },
+        async play() {
+          const s = await load();
+          s.reset();
+          return new Promise((r) => { tl = s.assemble(gsap, r); });
+        },
+        finish() { load().then((s) => { s.settle(); placePins(s); }); },
+        highlight(slug) { load().then((s) => s.highlight(slug, gsap)); },
+        pause() { tl?.pause(); },
+        resume() { tl?.resume(); },
+      });
+      addEventListener('resize', () => { scenePromise?.then((s) => { s.resize(); placePins(s); }); });
+      addEventListener('pagehide', () => { scenePromise?.then((s) => s.dispose()); });
+    }
+  }
+</script>

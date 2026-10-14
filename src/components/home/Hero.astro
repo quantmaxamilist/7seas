@@ -1,0 +1,97 @@
+---
+import { site } from '../../data/site';
+import { img } from '../../data/extra';
+import Icon from '../site/Icon.astro';
+import BgVideo from '../site/BgVideo.astro';
+import GoogleRating from '../site/GoogleRating.astro';
+import { area } from '../../data/site';
+// Tiles under the roofline — client photos only (no stock)
+const tiles = ['09', '04', '17', '26', '13', '33', '23', '30', '16'];
+---
+<section class="hero dark" data-hero>
+  <BgVideo name="street" opacity={0.62} mobile />
+  <div class="container hero__in">
+    <div class="hero__copy">
+      <p class="label hero__kicker" data-h-in>Builders in {area.town}, {area.county} · Across {area.region}</p>
+      <h1 class="display hero__h" data-h-in>7 Seas <span class="accent">Builders</span></h1>
+      <p class="lead hero__sub" data-h-in>{site.tagline}</p>
+      <div class="hero__acts" data-h-in>
+        <a class="btn" href="/contact">Free quote<Icon name="arrow" /></a>
+        <a class="btn btn--ghost" href="/gallery">Gallery</a>
+      </div>
+      <div class="hero__meta" data-h-in>
+        <a class="hero__tel" href={site.phoneHref}><Icon name="phone" />{site.phone}</a>
+        <GoogleRating />
+      </div>
+    </div>
+
+    <div class="hero__house" aria-hidden="true">
+      <div class="hero__clip">
+        {tiles.map((n, i) => (
+          <div class="hero__tile" style={`--i:${i}`}>
+            <img src={img(n, true)} alt="" width="560" height="560" fetchpriority={i < 3 ? 'high' : undefined} />
+          </div>
+        ))}
+      </div>
+      <svg class="hero__roof" viewBox="0 0 118 100">
+        <path class="r1" pathLength="1" d="M-2.4 47 L23.6 18 L42.5 36" />
+        <path class="r2" pathLength="1" d="M26 20 L81.4 1 L120.4 43" />
+        <path class="r3" pathLength="1" d="M52 11 V3 H60 V8.3" />
+      </svg>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero { position: relative; padding-top: calc(var(--header-h) + clamp(2rem, 1rem + 4vw, 5rem)); padding-bottom: clamp(3rem, 2rem + 4vw, 6rem); overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(90deg, rgba(5, 28, 51, 0.88) 0%, rgba(5, 28, 51, 0.6) 38%, rgba(5, 28, 51, 0.15) 70%, rgba(5, 28, 51, 0.4) 100%), linear-gradient(0deg, var(--navy) 0%, transparent 25%); }
+  .hero__in { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(2rem, 1rem + 3vw, 5rem); align-items: center; min-height: min(72vh, 720px); }
+  .hero__kicker { color: rgba(255, 255, 255, 0.7); margin-bottom: var(--s-5); }
+  .hero__h { font-size: var(--fs-hero); }
+  .hero__h span { display: block; }
+  .hero__sub { margin-top: var(--s-5); max-width: 30ch; color: rgba(255, 255, 255, 0.86); }
+  .hero__acts { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-6); }
+  .hero__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-5); margin-top: var(--s-5); }
+  .hero__tel { display: inline-flex; align-items: center; gap: 0.5em; font-family: var(--font-mono); text-decoration: none; color: rgba(255, 255, 255, 0.86); height: 44px; }
+  .hero__tel :global(svg) { width: 16px; color: var(--orange); }
+  .hero__tel:hover { color: var(--white); }
+
+  .hero__house { position: relative; aspect-ratio: 1.18; width: 100%; }
+  .hero__clip { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 6px;
+    clip-path: polygon(0 47%, 20% 18%, 36% 36%, 69% 1%, 100% 43%, 100% 100%, 0 100%); }
+  .hero__tile { overflow: hidden; background: var(--navy-2); }
+  .hero__tile img { width: 100%; height: 100%; object-fit: cover; }
+  .hero__roof { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .hero__roof path { fill: none; stroke-linecap: square; stroke-linejoin: miter; stroke-width: 2.4; }
+  .hero__roof .r1 { stroke: var(--blue-bright); }
+  .hero__roof .r2 { stroke: var(--orange); }
+  .hero__roof .r3 { stroke: var(--orange); stroke-width: 1.8; }
+
+  /* intro: roof draws, tiles rise, copy fades — ~2.2s, transform/opacity only (stroke offset is on a tiny svg) */
+  :global(.js) .hero__roof path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  :global(.js) .hero__tile img { opacity: 0; transform: scale(1.12); }
+  :global(.js) [data-h-in] { opacity: 0; transform: translateY(16px); }
+  .hero.play .hero__roof path { stroke-dashoffset: 0; transition: stroke-dashoffset 0.9s var(--ease-io); }
+  .hero.play .hero__roof .r2 { transition-delay: 0.15s; }
+  .hero.play .hero__roof .r3 { transition-delay: 0.55s; transition-duration: 0.4s; }
+  .hero.play .hero__tile img { opacity: 1; transform: none; transition: opacity 0.7s var(--ease-out), transform 1.1s var(--ease-out); transition-delay: calc(0.5s + var(--i) * 0.06s); }
+  .hero.play [data-h-in] { opacity: 1; transform: none; transition: opacity 0.6s var(--ease-out), transform 0.7s var(--ease-out); }
+  .hero.play [data-h-in]:nth-child(2) { transition-delay: 0.08s; }
+  .hero.play [data-h-in]:nth-child(3) { transition-delay: 0.16s; }
+  .hero.play [data-h-in]:nth-child(4) { transition-delay: 0.24s; }
+  .hero.play [data-h-in]:nth-child(5) { transition-delay: 0.3s; }
+  @media (max-width: 860px) { .hero::before { background: linear-gradient(180deg, rgba(5, 28, 51, 0.2) 0%, rgba(5, 28, 51, 0.7) 50%, rgba(5, 28, 51, 0.92) 100%); } }
+
+  @media (max-width: 860px) {
+    .hero__in { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+    .hero__house { order: -1; width: 100%; max-width: 560px; margin-inline: auto; }
+  }
+</style>
+
+<script>
+  const hero = document.querySelector('[data-hero]');
+  if (hero) {
+    requestAnimationFrame(() => requestAnimationFrame(() => hero.classList.add('play')));
+  }
+</script>

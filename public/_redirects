@@ -1,0 +1,8 @@
+/gallery/                      /gallery             301
+/contact/                      /contact             301
+/feed/*                        /                    301
+/comments/feed/*               /                    301
+/wp-sitemap.xml                /sitemap-index.xml   301
+/wp-sitemap-posts-page-1.xml   /sitemap-index.xml   301
+/wp-sitemap-users-1.xml        /sitemap-index.xml   301
+/author/*                      /                    301

@@ -1,0 +1,42 @@
+---
+import { site } from '../../data/site';
+import Icon from './Icon.astro';
+import BgVideo from './BgVideo.astro';
+interface Props { kicker?: string; title: string; lead?: string; crumbs?: { href: string; label: string }[] }
+const { kicker, title, lead, crumbs = [] } = Astro.props;
+---
+<section class="phero dark">
+  <BgVideo name="suburb" opacity={0.6} mobile />
+  <div class="container phero__in">
+    {crumbs.length > 0 && (
+      <nav class="phero__crumbs label" aria-label="Breadcrumb">
+        <a href="/">Home</a>{crumbs.map((c) => <>{' / '}<a href={c.href}>{c.label}</a></>)}
+      </nav>
+    )}
+    {kicker && <p class="label phero__k" data-reveal>{kicker}</p>}
+    <h1 class="display d1 phero__h" data-reveal>{title}</h1>
+    {lead && <p class="lead phero__lead" data-reveal style="--d:.06s">{lead}</p>}
+    <div class="phero__acts" data-reveal style="--d:.1s">
+      <a class="btn" href="/contact">Free quote<Icon name="arrow" /></a>
+      <a class="phero__tel" href={site.phoneHref}><Icon name="phone" />{site.phone}</a>
+    </div>
+  </div>
+  <svg class="phero__roof" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120 L260 40 L430 92 L860 0 L1200 104 V120Z" /></svg>
+</section>
+
+<style>
+  .phero { position: relative; padding-top: calc(var(--header-h) + clamp(2.5rem, 1.5rem + 4vw, 5.5rem)); padding-bottom: clamp(4.5rem, 3rem + 5vw, 8rem); overflow: hidden; }
+  .phero::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(90deg, rgba(5, 28, 51, 0.85) 0%, rgba(5, 28, 51, 0.55) 45%, rgba(5, 28, 51, 0.2) 100%), linear-gradient(0deg, var(--navy) 0%, transparent 30%); }
+  .phero__in { position: relative; z-index: 2; }
+  .phero__crumbs { color: rgba(255, 255, 255, 0.55); margin-bottom: var(--s-6); }
+  .phero__crumbs a { text-decoration: none; }
+  .phero__crumbs a:hover { color: var(--orange); }
+  .phero__k { color: var(--orange); margin-bottom: var(--s-4); }
+  .phero__lead { margin-top: var(--s-5); max-width: 52ch; color: rgba(255, 255, 255, 0.84); }
+  .phero__acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-5); margin-top: var(--s-6); }
+  .phero__tel { display: inline-flex; align-items: center; gap: 0.5em; font-family: var(--font-mono); text-decoration: none; height: 44px; }
+  .phero__tel :global(svg) { color: var(--orange); }
+  .phero__roof { z-index: 2; position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: clamp(28px, 5vw, 70px); fill: var(--paper); }
+  :global(.phero--white) .phero__roof { fill: var(--white); }
+</style>

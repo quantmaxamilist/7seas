@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/site/PageHero.astro';
+import PhotoGrid from '../components/site/PhotoGrid.astro';
+import QuoteBand from '../components/site/QuoteBand.astro';
+import { titles, descriptions, about } from '../data/site';
+import { photos } from '../data/extra';
+---
+<Base title={titles.gallery} description={descriptions.gallery} crumbs={[{ name: 'Gallery', path: '/gallery' }]}>
+  <PageHero title="Gallery" lead={about.paragraphs[2]} />
+  <section class="section light">
+    <div class="container"><PhotoGrid photos={photos} filters /></div>
+  </section>
+  <QuoteBand />
+</Base>

@@ -1,0 +1,113 @@
+---
+import { img, cats } from '../../data/extra';
+interface Photo { n: string; w: number; h: number; cat: string; alt: string }
+interface Props { photos: readonly Photo[]; filters?: boolean; id?: string }
+const { photos, filters = false, id = 'pg' } = Astro.props;
+const counts = Object.fromEntries(cats.map((c) => [c.id, photos.filter((p) => p.cat === c.id).length]));
+---
+<div class="pg" data-pg id={id}>
+  {filters && (
+    <div class="pg__filters" role="toolbar" aria-label="Filter photos">
+      <button type="button" class="pg__chip on" data-filter="all" aria-pressed="true">All <span>{photos.length}</span></button>
+      {cats.filter((c) => counts[c.id]).map((c) => (
+        <button type="button" class="pg__chip" data-filter={c.id} aria-pressed="false">{c.label} <span>{counts[c.id]}</span></button>
+      ))}
+    </div>
+  )}
+  <ul class="pg__grid" role="list">
+    {photos.map((p, i) => (
+      <li class:list={['pg__item', p.w > p.h ? 'is-wide' : 'is-tall']} data-cat={p.cat}>
+        <button type="button" class="pg__btn ph" data-i={i} data-src={img(p.n)} data-alt={p.alt} data-cursor aria-label={`Open photo: ${p.alt}`}>
+          <img src={img(p.n, true)} alt={p.alt} width={p.w > p.h ? 560 : 420} height={p.w > p.h ? 420 : 560} loading="lazy" decoding="async" />
+        </button>
+      </li>
+    ))}
+  </ul>
+
+  <dialog class="lb" data-lb aria-label="Photo viewer">
+    <figure class="lb__fig">
+      <img class="lb__img" alt="" />
+      <figcaption class="lb__cap"><span class="lb__alt"></span><span class="label lb__count"></span></figcaption>
+    </figure>
+    <button class="lb__nav lb__prev" type="button" aria-label="Previous photo" data-prev>←</button>
+    <button class="lb__nav lb__next" type="button" aria-label="Next photo" data-next>→</button>
+    <button class="lb__close" type="button" aria-label="Close" data-close>✕</button>
+  </dialog>
+</div>
+
+<style>
+  .pg__filters { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-bottom: var(--s-6); }
+  .pg__chip { height: 44px; padding: 0 1rem; border-radius: 999px; border: 1.5px solid var(--line); background: var(--white); font-weight: 500; font-size: 0.95rem; transition: background var(--dur-1), color var(--dur-1), border-color var(--dur-1); }
+  .pg__chip span { font-family: var(--font-mono); font-size: 0.8em; opacity: 0.6; margin-left: 0.2em; }
+  .pg__chip:hover { border-color: var(--navy); }
+  .pg__chip.on { background: var(--navy); border-color: var(--navy); color: var(--white); }
+  .pg__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: clamp(120px, 11vw, 190px); grid-auto-flow: dense; gap: 8px; }
+  .pg__item.is-tall { grid-row: span 2; }
+  .pg__item.is-wide { grid-column: span 2; grid-row: span 2; }
+  .pg__item[hidden] { display: none; }
+  .pg__btn { display: block; width: 100%; height: 100%; padding: 0; border: 0; }
+  .pg__btn img { transition: transform 0.8s var(--ease-out); }
+  .pg__btn:hover img { transform: scale(1.04); }
+  @media (max-width: 760px) {
+    .pg__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 120px; }
+    .pg__item.is-wide { grid-column: span 2; }
+  }
+
+  .lb { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: rgba(3, 14, 26, 0.96); color: var(--white); }
+  .lb::backdrop { background: transparent; }
+  .lb[open] { display: grid; place-items: center; }
+  .lb__fig { display: grid; gap: var(--s-3); max-width: min(92vw, 1100px); }
+  .lb__img { max-width: 100%; max-height: calc(100dvh - 140px); width: auto; margin: 0 auto; object-fit: contain; }
+  .lb__cap { display: flex; justify-content: space-between; gap: var(--s-4); font-size: var(--fs-small); color: rgba(255, 255, 255, 0.8); }
+  .lb__nav, .lb__close { position: fixed; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--line-dark); background: rgba(255, 255, 255, 0.06); color: var(--white); font-size: 1.2rem; }
+  .lb__nav:hover, .lb__close:hover { background: var(--orange); color: var(--navy); border-color: var(--orange); }
+  .lb__prev { left: max(12px, 2vw); top: 50%; translate: 0 -50%; }
+  .lb__next { right: max(12px, 2vw); top: 50%; translate: 0 -50%; }
+  .lb__close { right: max(12px, 2vw); top: 16px; }
+  @media (max-width: 760px) { .lb__prev, .lb__next { top: auto; bottom: 16px; translate: none; } }
+</style>
+
+<script>
+  document.querySelectorAll('[data-pg]').forEach((root) => {
+    const items = [...root.querySelectorAll('.pg__item')];
+    const chips = [...root.querySelectorAll('.pg__chip')];
+    chips.forEach((c) => c.addEventListener('click', () => {
+      const f = c.dataset.filter;
+      chips.forEach((x) => { x.classList.toggle('on', x === c); x.setAttribute('aria-pressed', String(x === c)); });
+      items.forEach((it) => { it.hidden = f !== 'all' && it.dataset.cat !== f; });
+      // let ScrollTrigger / Lenis know the height changed
+      requestAnimationFrame(() => (window as any).__lenis?.resize?.());
+    }));
+
+    const lb = root.querySelector('dialog') as HTMLDialogElement | null;
+    if (!lb) return;
+    const im = lb.querySelector('.lb__img') as HTMLImageElement;
+    const alt = lb.querySelector('.lb__alt')!;
+    const count = lb.querySelector('.lb__count')!;
+    let list: HTMLElement[] = [], idx = 0;
+    const show = (i: number) => {
+      idx = (i + list.length) % list.length;
+      const b = list[idx];
+      im.src = b.dataset.src!; im.alt = b.dataset.alt!;
+      alt.textContent = b.dataset.alt!;
+      count.textContent = `Photo ${idx + 1} of ${list.length}`;
+    };
+    const close = () => { if (lb.open) lb.close(); (window as any).__lenis?.start(); };
+    root.querySelectorAll<HTMLElement>('.pg__btn').forEach((b) => b.addEventListener('click', () => {
+      list = [...root.querySelectorAll<HTMLElement>('.pg__item:not([hidden]) .pg__btn')];
+      show(list.indexOf(b));
+      lb.showModal();
+      (window as any).__lenis?.stop();
+    }));
+    lb.querySelector('[data-prev]')!.addEventListener('click', () => show(idx - 1));
+    lb.querySelector('[data-next]')!.addEventListener('click', () => show(idx + 1));
+    lb.querySelector('[data-close]')!.addEventListener('click', close);
+    lb.addEventListener('click', (e) => { if (e.target === lb) close(); });
+    lb.addEventListener('close', () => (window as any).__lenis?.start());
+    lb.addEventListener('cancel', () => (window as any).__lenis?.start());
+    lb.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(idx - 1);
+      if (e.key === 'ArrowRight') show(idx + 1);
+    });
+  });
+</script>

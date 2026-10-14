@@ -1,0 +1,108 @@
+---
+import '@fontsource-variable/mona-sans/wdth.css';
+import '@fontsource-variable/geist';
+import '@fontsource/geist-mono/400.css';
+import '@fontsource/geist-mono/500.css';
+import '../styles/tokens.css';
+import '../styles/global.css';
+import Header from '../components/site/Header.astro';
+import Footer from '../components/site/Footer.astro';
+import { site, google, area, services, descriptions } from '../data/site';
+
+interface Props { title: string; description?: string; image?: string; noindex?: boolean; crumbs?: { name: string; path: string }[]; extraLd?: object[] }
+const { title, description = descriptions.home, image = '/img/og.jpg', noindex = false, crumbs = [], extraLd = [] } = Astro.props;
+const canonical = new URL(Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/', Astro.site);
+const bizId = new URL('/#business', Astro.site).href;
+const ld: object[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': ['GeneralContractor', 'HomeAndConstructionBusiness'],
+    '@id': bizId,
+    name: site.name,
+    legalName: google.name,
+    alternateName: site.legalName,
+    url: Astro.site?.href,
+    telephone: site.phone,
+    email: site.email,
+    logo: new URL('/img/brand/logo.png', Astro.site).href,
+    image: new URL('/img/og.jpg', Astro.site).href,
+    description: descriptions.home,
+    address: { '@type': 'PostalAddress', streetAddress: '12 Fairfax Rd', addressLocality: area.town, addressRegion: area.county, postalCode: 'GU22 9HW', addressCountry: 'GB' },
+    geo: { '@type': 'GeoCoordinates', latitude: google.geo.lat, longitude: google.geo.lng },
+    hasMap: google.cidUrl,
+    sameAs: [google.cidUrl],
+    openingHoursSpecification: google.hours.filter((h) => h.schema).map((h) => ({ '@type': 'OpeningHoursSpecification', ...h.schema })),
+    areaServed: [
+      { '@type': 'City', name: area.town },
+      { '@type': 'AdministrativeArea', name: area.county },
+      { '@type': 'AdministrativeArea', name: area.region },
+    ],
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog', name: 'Building services',
+      itemListElement: services.map((sv) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: sv.name, url: new URL(`/services/${sv.slug}`, Astro.site).href } })),
+    },
+  },
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: site.name, url: Astro.site?.href, inLanguage: 'en-GB', publisher: { '@id': bizId } },
+  ...(crumbs.length ? [{
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: [{ name: 'Home', path: '/' }, ...crumbs].map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: new URL(c.path, Astro.site).href })),
+  }] : []),
+  ...extraLd,
+];
+---
+---
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="geo.region" content="GB-SRY" />
+    <meta name="geo.placename" content={`${area.town}, ${area.county}`} />
+    <meta name="geo.position" content={`${google.geo.lat};${google.geo.lng}`} />
+    <meta name="ICBM" content={`${google.geo.lat}, ${google.geo.lng}`} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, Astro.site)} />
+    <meta name="theme-color" content="#051c33" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    {ld.map((o) => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
+    <slot name="head" />
+  </head>
+  <body id="top">
+    <a class="skip" href="#main">Skip to content</a>
+    <Header />
+    <main id="main"><slot /></main>
+    <Footer />
+    <div class="pt" aria-hidden="true"></div>
+    <div class="cur" aria-hidden="true"><span class="cur__ring"></span><span class="cur__dot"></span></div>
+    <script>import '../scripts/core.js';</script>
+  </body>
+</html>
+
+<style is:global>
+  .pt { position: fixed; inset: 0; z-index: var(--z-transition); background: var(--navy); pointer-events: none; transform: translateY(100%); visibility: hidden; }
+  .pt.out, .pt.in, html.pt-in .pt { visibility: visible; }
+  .pt::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: var(--orange); }
+  .pt.out { transform: none; transition: transform 0.32s var(--ease-io); }
+  html.pt-in .pt { transform: none; }
+  .pt.in { transform: translateY(-100%); transition: transform 0.4s var(--ease-io); }
+
+  .cur { position: fixed; left: 0; top: 0; z-index: var(--z-cursor); pointer-events: none; display: none; }
+  @media (hover: hover) and (pointer: fine) { html.js .cur { display: block; } }
+  .cur__ring, .cur__dot { position: absolute; left: 0; top: 0; border-radius: 50%; transform: translate(-50%, -50%); }
+  .cur__ring { width: 24px; height: 24px; border: 1.5px solid var(--orange); transition: width var(--dur-2) var(--ease-out), height var(--dur-2) var(--ease-out), opacity var(--dur-2); }
+  .cur__dot { width: 6px; height: 6px; background: var(--orange); }
+  .cur.big .cur__ring { width: 40px; height: 40px; }
+  .cur.off { opacity: 0; }
+</style>

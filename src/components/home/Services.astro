@@ -1,0 +1,55 @@
+---
+import ServiceList from '../wow/ServiceList.astro';
+import WowHouse from '../wow/WowHouse.astro';
+import WowBlueprint from '../wow/WowBlueprint.astro';
+import Icon from '../site/Icon.astro';
+import BgVideo from '../site/BgVideo.astro';
+interface Props { variant?: 'house' | 'blueprint'; heading?: string; level?: 'h1' | 'h2' }
+const { variant = 'house', heading = 'Services' } = Astro.props;
+---
+<section class="svc section dark" aria-labelledby="svc-h" data-wow={variant}>
+  <BgVideo name="brick" opacity={0.3} />
+  <div class="container svc__in">
+    <div class="svc__head">
+      <h2 id="svc-h" class="display d2" data-reveal>{heading}</h2>
+      <p class="label svc__count" data-reveal>3 services · tap one to see the work</p>
+    </div>
+    <div class="svc__grid">
+      <div class="svc__stage" data-stage>
+        {variant === 'house' ? <WowHouse /> : <WowBlueprint />}
+        <button class="svc__replay" type="button" data-replay><Icon name="replay" />Replay</button>
+      </div>
+      <div class="svc__list">
+        <ServiceList />
+        <a class="btn svc__cta" href="/contact">Free quote<Icon name="arrow" /></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .svc { position: relative; overflow: hidden; }
+  .svc::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(80% 70% at 30% 55%, rgba(5, 28, 51, 0.2), rgba(5, 28, 51, 0.75) 90%); }
+  .svc__in { position: relative; z-index: 2; }
+  .svc__head { display: flex; justify-content: space-between; align-items: end; gap: var(--s-4); flex-wrap: wrap; margin-bottom: var(--s-6); }
+  .svc__count { color: rgba(255, 255, 255, 0.6); }
+  .svc__grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(2rem, 1rem + 3vw, 4.5rem); align-items: center; }
+  .svc__stage { position: relative; aspect-ratio: 8 / 6.2; }
+  .svc__replay { position: absolute; right: 0; bottom: 0; display: inline-flex; align-items: center; gap: 0.5em; height: 40px; padding: 0 0.9rem;
+    background: rgba(255, 255, 255, 0.06); border: 1px solid var(--line-dark); border-radius: var(--radius); font-size: var(--fs-small);
+    opacity: 0; pointer-events: none; transition: opacity var(--dur-3); }
+  .svc__replay :global(svg) { width: 15px; }
+  .svc__replay:hover { background: rgba(255, 255, 255, 0.12); }
+  .svc.done .svc__replay { opacity: 1; pointer-events: auto; }
+  .svc:has(:global(.wh.poster)) .svc__replay { display: none; }
+  @media (prefers-reduced-motion: reduce) { .svc__replay { display: none; } }
+  /* list keeps its layout; only fades in once the model is built */
+  :global(.js) .svc__list { opacity: 0; transform: translateY(10px); }
+  .svc.done .svc__list { opacity: 1; transform: none; transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out); }
+  .svc__cta { margin-top: var(--s-6); }
+  @media (max-width: 960px) {
+    .svc__grid { grid-template-columns: minmax(0, 1fr); }
+    .svc__stage { margin-bottom: 52px; }
+    .svc__replay { bottom: -52px; }
+  }
+</style>

@@ -1,0 +1,15 @@
+---
+// Low-opacity background footage (Pexels licence — see CREDITS.md). Loads only near the viewport,
+// pauses off screen, poster only for reduced motion.
+interface Props { name: 'street' | 'suburb' | 'brick' | 'plaster'; opacity?: number; mobile?: boolean; blend?: 'normal' | 'multiply' | 'screen' }
+const { name, opacity = 0.25, mobile = false, blend = 'normal' } = Astro.props;
+---
+<div class="bgv" aria-hidden="true" style={`--o:${opacity};--blend:${blend}`}>
+  <video muted playsinline loop preload="none" poster={`/video/${name}.jpg`} data-bgv
+    data-src={`/video/${name}.mp4`} data-src-m={mobile ? `/video/${name}-m.mp4` : `/video/${name}.mp4`}></video>
+</div>
+
+<style>
+  .bgv { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; mix-blend-mode: var(--blend); }
+  .bgv video { width: 100%; height: 100%; object-fit: cover; opacity: var(--o); }
+</style>
